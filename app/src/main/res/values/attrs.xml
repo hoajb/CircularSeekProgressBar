@@ -1,0 +1,24 @@
+<resources>
+    <declare-styleable name="RoundProgressBar">
+        <attr name="cp_strokeWidth" format="dimension" />
+        <attr name="cp_text" format="reference" />
+        <attr name="cp_textSize" format="dimension" />
+        <attr name="cp_progress_color" format="reference" />
+        <attr name="cp_progress_background_color" format="reference" />
+        <attr name="cp_bg_color" format="reference" />
+        <attr name="cp_progress" format="integer" />
+        <attr name="cp_max_progress" format="integer" />
+        <attr name="cp_min_progress" format="integer" />
+        <attr name="cp_format_string" format="reference" />
+        <attr name="cp_text_top" format="string" />
+        <attr name="cp_text_topSize" format="dimension" />
+        <attr name="cp_text_topColor" format="reference" />
+        <attr name="cp_text_bottom" format="string" />
+        <attr name="cp_text_bottomSize" format="dimension" />
+        <attr name="cp_text_bottomColor" format="reference" />
+        <attr name="cp_auto_change_text_color" format="boolean" />
+        <attr name="cp_percent_touch_virtual" format="integer" />
+        <attr name="cp_enable_circle_head" format="boolean" />
+    </declare-styleable>
+
+</resources>

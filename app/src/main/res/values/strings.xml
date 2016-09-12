@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SeekProgressBar</string>
+
+    <string name="format_string_base_2">%d</string>
+    <string name="format_string_concentric_2">-%d</string>
+    <string name="format_string_eccentric_2">+%d</string>
+</resources>
