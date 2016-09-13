@@ -1,7 +1,7 @@
 <resources>
     <declare-styleable name="RoundProgressBar">
         <attr name="cp_strokeWidth" format="dimension" />
-        <attr name="cp_text" format="reference" />
+        <attr name="cp_text_center" format="string" />
         <attr name="cp_textSize" format="dimension" />
         <attr name="cp_progress_color" format="reference" />
         <attr name="cp_progress_background_color" format="reference" />

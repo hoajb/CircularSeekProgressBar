@@ -10,7 +10,6 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -26,17 +25,17 @@ public class CircularProgressBar extends View {
     private static final int MAX_PROGRESS = 100;
     private static final int MIN_PROGRESS = 0;
     private static final float STROKE_WIDTH = 20.0f;
-    private RectF mCircleProgressBounds;
-    private RectF mCircleColorBounds;
+    private RectF mProgressBounds;
     private RectF mHalfCircleBounds;
 
     private int mLayoutHeight = 0;
     private int mLayoutWidth = 0;
     protected float mStrokeWidth = STROKE_WIDTH;
+
     private Paint mPaintTextCenter;
     private Paint mPaintTextTop;
     private Paint mPaintTextBottom;
-    private Paint mColorPaint;
+    private Paint mPaintProgress;
     private Paint mPaintHalfCircle;
     private Paint mPaintProgressBackground;
 
@@ -51,10 +50,10 @@ public class CircularProgressBar extends View {
     protected int mMinProgress = MIN_PROGRESS;
     protected float mMinAngle = 0;
     protected float mAnglePerProgress;
-    private float mFontSize = 14;
+    private float mFontSizeCenter = 14;
     private float mFontSizeTop = 10;
     private float mFontSizeBottom = 10;
-    private String mText;
+    private String mTextCenter;
     protected String mTextTop;
     protected String mTextBottom;
 
@@ -66,7 +65,6 @@ public class CircularProgressBar extends View {
 
     protected int mQuadrant;
     protected String mFormatString;
-    private Typeface mTypefaceMohaveBold;
     protected int[] mColors;
     protected int mPercentTouchVirtual;
 
@@ -109,8 +107,7 @@ public class CircularProgressBar extends View {
         int lime = getResources().getColor(R.color.circle_Lime);
         int yellow = getResources().getColor(R.color.circle_Yellow);
         mColors = new int[]{green, yellow, lime, lightOrange, orange};
-        mCircleProgressBounds = new RectF();
-        mCircleColorBounds = new RectF();
+        mProgressBounds = new RectF();
         mHalfCircleBounds = new RectF();
         TypedArray ta = getContext().obtainStyledAttributes(attrs,
                 R.styleable.RoundProgressBar, style, 0);
@@ -151,19 +148,15 @@ public class CircularProgressBar extends View {
         setProgressValue(mProgressValue);
         mAngle = getAngle(mProgressValue);
 
-        mFontSize = ta.getDimension(R.styleable.RoundProgressBar_cp_textSize,
-                mFontSize);
+        mFontSizeCenter = ta.getDimension(R.styleable.RoundProgressBar_cp_textSize,
+                mFontSizeCenter);
         mFontSizeTop = ta.getDimension(R.styleable.RoundProgressBar_cp_text_topSize,
                 mFontSizeTop);
         mFontSizeBottom = ta.getDimension(R.styleable.RoundProgressBar_cp_text_bottomSize,
                 mFontSizeBottom);
 
-        int textResource = ta
-                .getResourceId(R.styleable.RoundProgressBar_cp_text, -1);
-        if (textResource != -1) {
-            mText = getResources().getString(textResource);
-        }
-        mTypefaceMohaveBold = null;
+        mTextCenter = ta.getString(R.styleable.RoundProgressBar_cp_text_center);
+
         setupPaints();
         ta.recycle();
     }
@@ -174,28 +167,24 @@ public class CircularProgressBar extends View {
                 mStrokeWidth,
                 r.getDisplayMetrics());
 
-        mColorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaintProgress = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaintTextCenter = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaintTextTop = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaintTextBottom = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         mPaintTextCenter.setColor(mProgressColor);
         mPaintTextCenter.setTextAlign(Paint.Align.CENTER);
-        mPaintTextCenter.setTextSize(mFontSize);
-        mPaintTextCenter.setTypeface(mTypefaceMohaveBold);
+        mPaintTextCenter.setTextSize(mFontSizeCenter);
 
         mPaintTextTop.setColor(mTextTopColor);
         mPaintTextTop.setTextAlign(Paint.Align.CENTER);
         mPaintTextTop.setTextSize(mFontSizeTop);
-        mPaintTextTop.setTypeface(mTypefaceMohaveBold);
 
         mPaintTextBottom.setColor(mTextBottomColor);
         mPaintTextBottom.setTextAlign(Paint.Align.CENTER);
         mPaintTextBottom.setTextSize(mFontSizeBottom);
-        mPaintTextBottom.setTypeface(mTypefaceMohaveBold);
 
-//        setupDefaultPaint(mPaintProgress, mStrokeWidth);
-        setupDefaultPaint(mColorPaint, mStrokeWidth);
+        setupDefaultPaint(mPaintProgress, mStrokeWidth);
 
         mPaintHalfCircle = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaintHalfCircle.setStyle(Paint.Style.FILL);
@@ -233,34 +222,27 @@ public class CircularProgressBar extends View {
         updateProgressBounds();
 
         mProgressRadius = mProgressRadius * 100 / mPercentTouchVirtual;
-//        mProgressRadius = mColorRadius - mStrokeWidth * 7;
         updateProgressBounds();
         Shader s = new SweepGradient(mCx, mCy, mColors, null);
-        mColorPaint.setShader(s);
+        mPaintProgress.setShader(s);
         mPaintHalfCircle.setShader(s);
     }
 
     protected void updateProgressBounds() {
         float halfStroke = mStrokeWidth / 2;
-        mCircleProgressBounds.left = mCx - mProgressRadius + halfStroke;
-        mCircleProgressBounds.top = mCy - mProgressRadius + halfStroke;
-        mCircleProgressBounds.right = mCx + mProgressRadius - halfStroke;
-        mCircleProgressBounds.bottom = mCy + mProgressRadius - halfStroke;
-
-        mCircleColorBounds.left = mCx - mProgressRadius + halfStroke;
-        mCircleColorBounds.top = mCy - mProgressRadius + halfStroke;
-        mCircleColorBounds.right = mCx + mProgressRadius - halfStroke;
-        mCircleColorBounds.bottom = mCy + mProgressRadius - halfStroke;
+        mProgressBounds.left = mCx - mProgressRadius + halfStroke;
+        mProgressBounds.top = mCy - mProgressRadius + halfStroke;
+        mProgressBounds.right = mCx + mProgressRadius - halfStroke;
+        mProgressBounds.bottom = mCy + mProgressRadius - halfStroke;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-//        Log.d("canvas", mProgressValue + "");
         if (mProgressValue > 0) {
-            this.mText = String.format(mFormatString, mProgressValue);
+            this.mTextCenter = String.format(mFormatString, mProgressValue);
         } else {
-            this.mText = String.format(getResources().getString(R.string.format_string_base_2), mProgressValue);
+            this.mTextCenter = String.format(getResources().getString(R.string.format_string_base_2), mProgressValue);
         }
 
         this.drawMultilineText(canvas);
@@ -269,8 +251,8 @@ public class CircularProgressBar extends View {
 
         canvas.rotate(270, mCx, mCy);
 
-        canvas.drawArc(mCircleColorBounds, mAngle, 360, false, mPaintProgressBackground);
-        canvas.drawArc(mCircleColorBounds, 0, mAngle, false, mColorPaint);
+        canvas.drawArc(mProgressBounds, mAngle, 360, false, mPaintProgressBackground);
+        canvas.drawArc(mProgressBounds, 0, mAngle, false, mPaintProgress);
 
         if (mEnableCircleHead) {
             reCalBound(mAngle);
@@ -289,10 +271,10 @@ public class CircularProgressBar extends View {
 
 
     private void drawMultilineText(Canvas canvas) {
-        if (!TextUtils.isEmpty(mText)) {
+        if (!TextUtils.isEmpty(mTextCenter)) {
             float xPos = mCx;
             float yPos = (int) (mCy - ((mPaintTextCenter.descent() + mPaintTextCenter.ascent()) / 2));
-            canvas.drawText(mText, xPos, yPos, mPaintTextCenter);
+            canvas.drawText(mTextCenter, xPos, yPos, mPaintTextCenter);
         }
     }
 
@@ -426,7 +408,7 @@ public class CircularProgressBar extends View {
 
     public void setFormatString(String format) {
         mFormatString = format;
-        mText = String.format(format, mProgressValue);
+        mTextCenter = String.format(format, mProgressValue);
         postInvalidate();
     }
 
